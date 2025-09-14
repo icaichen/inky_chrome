@@ -1,0 +1,96 @@
+// popup.js — handle popup state, highlight active buttons, and forward messages
+
+async function withTab(fn) {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.url || !/^https?:\/\//.test(tab.url)) {
+    console.warn("This page is not supported:", tab?.url);
+    return;
+  }
+  return fn(tab);
+}
+
+function send(tabId, msg) {
+  chrome.tabs.sendMessage(tabId, msg, () => {
+    if (chrome.runtime.lastError) {
+      console.error("Message error:", chrome.runtime.lastError.message);
+    } else {
+      console.log("✅ Sent:", msg);
+    }
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btnEink = document.getElementById("toggleEink");
+  const btnKindle = document.getElementById("toggleKindle");
+  const btnFull = document.getElementById("colorFull");
+  const btnSoft = document.getElementById("colorSoft");
+  const btnBW = document.getElementById("colorBW");
+
+  let currentMode = null;   // "focus" | "kindle" | null
+  let currentColor = null;  // "full" | "soft" | "bw" | null
+
+  function setActive(el, active) {
+    if (!el) return;
+    if (active) el.classList.add("active"); else el.classList.remove("active");
+  }
+
+  function render() {
+    setActive(btnEink, currentMode === "focus");
+    setActive(btnKindle, currentMode === "kindle");
+    setActive(btnFull, currentColor === "full");
+    setActive(btnSoft, currentColor === "soft");
+    setActive(btnBW, currentColor === "bw");
+  }
+
+  // Initialize from storage; default colorMode to "bw" if not set
+  chrome.storage.local.get(["mode", "colorMode"], (s) => {
+    currentMode = s.mode ?? null;
+    currentColor = s.colorMode ?? "bw";
+    render();
+  });
+
+  // Reflect external changes
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.mode) currentMode = changes.mode.newValue ?? null;
+    if (changes.colorMode) currentColor = changes.colorMode.newValue ?? null;
+    render();
+  });
+
+  // Click handlers — optimistic UI + persist + message
+  btnEink?.addEventListener("click", () => {
+    currentMode = currentMode === "focus" ? null : "focus";
+    render();
+    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
+    withTab((tab) => send(tab.id, { action: "toggleEink" }));
+  });
+
+  btnKindle?.addEventListener("click", () => {
+    currentMode = currentMode === "kindle" ? null : "kindle";
+    render();
+    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
+    withTab((tab) => send(tab.id, { action: "toggleKindle" }));
+  });
+
+  btnFull?.addEventListener("click", () => {
+    currentColor = "full";
+    render();
+    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
+    withTab((tab) => send(tab.id, { action: "setColorMode", value: "full" }));
+  });
+
+  btnSoft?.addEventListener("click", () => {
+    currentColor = "soft";
+    render();
+    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
+    withTab((tab) => send(tab.id, { action: "setColorMode", value: "soft" }));
+  });
+
+  btnBW?.addEventListener("click", () => {
+    currentColor = "bw";
+    render();
+    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
+    withTab((tab) => send(tab.id, { action: "setColorMode", value: "bw" }));
+  });
+
+  console.log("✅ Popup loaded");
+});

@@ -99,10 +99,24 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   btnReader?.addEventListener("click", () => {
-    readerActive = !readerActive;
-    render();
+    readerActive = !readerActive; // optimistic toggle
     chrome.storage.local.set({ readerMode: readerActive });
-    withTab(tab => send(tab.id, { action: "toggleReader" }));
+    render();
+
+    withTab(tab => {
+      chrome.tabs.sendMessage(tab.id, { action: "toggleReader" }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.error("Reader toggle error:", chrome.runtime.lastError.message);
+          return;
+        }
+        if (response && typeof response.enabled !== "undefined") {
+          // sync with content script response
+          readerActive = response.enabled;
+          chrome.storage.local.set({ readerMode: readerActive });
+          render();
+        }
+      });
+    });
   });
 
   console.log("✅ Popup loaded");

@@ -32,16 +32,16 @@ function applyReaderMode() {
           // 内部“白色卡片”，负责包住全部正文
           const contentBox = document.createElement("div");
           Object.assign(contentBox.style, {
-            maxWidth: "860px",          // 比之前更宽
+            maxWidth: "860px",
             width: "100%",
             margin: "0 auto",
             padding: "2rem 2.25rem",
-            background: "#fff",
+            // background: "#fff",  // ❌ 去掉纯白背景
             borderRadius: "14px",
             boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
-            overflow: "hidden"          // 图片等元素不溢出阴影
+            overflow: "hidden"
           });
-
+          
           // 插入标题和内容
           const titleElem = document.createElement("h1");
           titleElem.innerText = article.title || "";
@@ -253,12 +253,18 @@ function applyReaderMode() {
   // -------- 独立监听器 --------
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "toggleReader") {
-      const readerContainer = document.getElementById("reader-mode-container");
-      if (readerContainer) {
+      const on = !!document.getElementById("reader-mode-container");
+      if (on) {
         disableReaderMode();
       } else {
         applyReaderMode();
       }
-      sendResponse({ status: "done" });
+      sendResponse({ status: "done", enabled: !on });
+      return;
+    }
+    if (message.action === "getReaderState") {
+      const on = !!document.getElementById("reader-mode-container");
+      sendResponse({ enabled: on });
+      return;
     }
   });

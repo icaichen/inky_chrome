@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.local.get(["mode", "colorMode", "readerMode"], (s) => {
     currentMode = s.mode ?? null;
     currentColor = s.colorMode ?? "bw";
-    readerActive = s.readerMode ?? false;
+    readerActive = false;
     render();
   });
 
@@ -110,10 +110,8 @@ document.addEventListener("DOMContentLoaded", () => {
           return;
         }
         if (response && typeof response.enabled !== "undefined") {
-          // sync with content script response
           readerActive = response.enabled;
-          chrome.storage.local.set({ readerMode: readerActive });
-          render();
+          render(); // ✅ 只更新 UI，不存储到全局
         }
       });
     });

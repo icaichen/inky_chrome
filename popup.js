@@ -42,22 +42,33 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Always show colorSelect dropdown
     colorSelect.style.display = "block";
-    // Set value to currentColor or empty string if null/undefined
-    colorSelect.value = currentColor ?? "";
+    // Set value to "" if no currentMode, else currentColor or empty string
+    colorSelect.value = !currentMode ? "" : (currentColor ?? "");
   }
 
   // Initialize from storage; allow colorMode to be null (no pre-selection)
   chrome.storage.local.get(["mode", "colorMode", "readerMode"], (s) => {
     currentMode = s.mode ?? null;
-    currentColor = s.colorMode ?? null;
-    readerActive = false;
+    readerActive = Boolean(s.readerMode);
+    if (!currentMode) {
+      currentColor = null;
+    } else {
+      currentColor = s.colorMode ?? null;
+    }
     render();
   });
 
   // Reflect external changes
   chrome.storage.onChanged.addListener((changes) => {
-    if (changes.mode) currentMode = changes.mode.newValue ?? null;
-    if (changes.colorMode) currentColor = changes.colorMode.newValue ?? null;
+    if (changes.mode) {
+      currentMode = changes.mode.newValue ?? null;
+      if (!currentMode) {
+        currentColor = null;
+      }
+    }
+    if (changes.colorMode) {
+      currentColor = changes.colorMode.newValue ?? null;
+    }
     if (changes.readerMode) readerActive = changes.readerMode.newValue ?? false;
     render();
   });
@@ -65,6 +76,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Click handlers — optimistic UI + persist + message
   btnEink?.addEventListener("click", () => {
     currentMode = currentMode === "focus" ? null : "focus";
+    if (currentMode === null) {
+      currentColor = null;
+    }
     render();
     chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
     withTab((tab) => send(tab.id, { action: "toggleEink" }));
@@ -72,12 +86,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   btnKindle?.addEventListener("click", () => {
     currentMode = currentMode === "kindle" ? null : "kindle";
+    if (currentMode === null) {
+      currentColor = null;
+    }
     render();
     chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
     withTab((tab) => send(tab.id, { action: "toggleKindle" }));
   });
 
   colorSelect?.addEventListener("change", () => {
+    if (!currentMode) {
+      colorSelect.value = "";
+      currentColor = null;
+      render();
+      return;
+    }
     currentColor = colorSelect.value;
     render();
     chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });

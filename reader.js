@@ -31,34 +31,35 @@ function applyReaderMode() {
     let oldContainer = document.getElementById("reader-mode-container");
     if (oldContainer) oldContainer.remove();
   
-    // 创建容器
+    // 创建外层容器（只负责滚动与居中留白）
     const readerContainer = document.createElement("div");
     readerContainer.id = "reader-mode-container";
     Object.assign(readerContainer.style, {
       position: "fixed",
-      top: "0",
-      left: "0",
-      width: "100%",
-      height: "100%",
-      backgroundColor: "#fff",
+      inset: "0",
+      background: "#f5f7fa",
       color: "#000",
       overflowY: "auto",
-      padding: "2rem",
       zIndex: "999999",
       fontSize: "1.1rem",
       lineHeight: "1.8",
       fontFamily: "Georgia, serif",
-      display: "flex",
-      justifyContent: "center"
+      padding: "2.5rem 0",        // 让卡片上下留白，不挤在边缘
+      display: "block"
     });
-  
-    // 内部居中 box
+
+    // 内部“白色卡片”，负责包住全部正文
     const contentBox = document.createElement("div");
     Object.assign(contentBox.style, {
-      maxWidth: "700px",
-      width: "100%"
+      maxWidth: "860px",          // 比之前更宽
+      width: "100%",
+      margin: "0 auto",
+      padding: "2rem 2.25rem",
+      background: "#fff",
+      borderRadius: "14px",
+      boxShadow: "0 8px 24px rgba(0,0,0,0.08)",
+      overflow: "hidden"          // 图片等元素不溢出阴影
     });
-  
     // 关闭按钮
     const closeButton = document.createElement("button");
     closeButton.innerText = "退出阅读模式";

@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Privacy Policy – E-Ink Paper Mode (Chrome Extension)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root { color-scheme: light dark; }
+    body { font: 16px/1.6 -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; margin: 0; }
+    .wrap { max-width: 860px; margin: 48px auto; padding: 0 20px; }
+    h1 { font-size: 28px; margin: 0 0 16px; }
+    h2 { font-size: 20px; margin: 28px 0 10px; }
+    p, li { color: #333; }
+    code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
+    a { color: #0b5bd3; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .muted { color:#666; font-size:14px; margin-top:28px; }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <h1>Privacy Policy – E-Ink Paper Mode (Chrome Extension)</h1>
+    <p><strong>Last updated:</strong> <span id="d"></span></p>
+
+    <h2>Overview</h2>
+    <p>
+      E-Ink Paper Mode transforms webpages into a paper-like reading experience (Focus Mode / Kindle Mode),
+      with optional color controls and a Safari-style Reader view. The extension runs entirely in your browser.
+      <strong>We do not collect, store, transmit, sell, or share any personal data.</strong>
+    </p>
+
+    <h2>Data Collection</h2>
+    <ul>
+      <li>No personally identifiable information (PII) is collected.</li>
+      <li>No browsing history, keystrokes, or page contents are collected or transmitted.</li>
+      <li>No analytics, advertising trackers, or third-party scripts are used.</li>
+    </ul>
+
+    <h2>What We Store Locally</h2>
+    <p>
+      The extension uses <code>chrome.storage</code> to save your preferences <em>locally</em> on your device:
+    </p>
+    <ul>
+      <li>Current mode (Focus / Kindle / none)</li>
+      <li>Selected color option (Full / Soft / B&amp;W)</li>
+      <li>Reader mode toggle</li>
+    </ul>
+    <p>These settings never leave your device.</p>
+
+    <h2>Permissions Explained</h2>
+    <ul>
+      <li><strong>activeTab</strong> – Apply or remove the reading/filter effects on the tab you are viewing.</li>
+      <li><strong>storage</strong> – Persist your mode and color preferences across tabs/sessions.</li>
+      <li><strong>scripting</strong> – Inject/remove the styles and overlays that create the paper effect.</li>
+      <li><strong>webNavigation</strong> – Re-apply your chosen mode on SPA navigations and new page loads for consistency.</li>
+      <li><strong>Host permissions (&lt;all_urls&gt;)</strong> – The extension must be able to adjust any site the user visits, to fulfill its single purpose.</li>
+    </ul>
+
+    <h2>Remote Code</h2>
+    <p>
+      The extension <strong>does not</strong> execute remote code. All scripts and assets are packaged inside the extension.
+    </p>
+
+    <h2>Children’s Privacy</h2>
+    <p>
+      The extension is a utility tool and does not target children or collect any personal data.
+    </p>
+
+    <h2>Changes to This Policy</h2>
+    <p>
+      We may update this policy to reflect improvements or compliance updates. We will update the “Last updated” date above.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions? Contact: <a href="mailto:hello@icaichen.com">hello@icaichen.com</a>
+      (replace with your preferred email).
+    </p>
+
+    <p class="muted">© <span id="y"></span> E-Ink Paper Mode</p>
+  </main>
+  <script>
+    const d = new Date();
+    document.getElementById('d').textContent = d.toLocaleDateString();
+    document.getElementById('y').textContent = d.getFullYear();
+  </script>
+</body>
+</html>

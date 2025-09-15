@@ -14,6 +14,7 @@ function safeSend(tabId, msg) {
   try { chrome.tabs.sendMessage(tabId, msg, () => { void chrome.runtime.lastError; }); } catch(_) {}
 }
 function applyToTab(tabId, url) {
+  if (!url) return;
   if (!isHttp(url)) return; // ignore chrome://newtab 等
   chrome.storage.local.get(["mode", "colorMode"], ({ mode, colorMode }) => {
     safeSend(tabId, { action: "forceApply", mode, colorMode });
@@ -21,14 +22,24 @@ function applyToTab(tabId, url) {
 }
 
 // 页面加载完成时尝试恢复
-chrome.webNavigation.onCompleted.addListener(({ tabId, url }) => { applyToTab(tabId, url); });
+chrome.webNavigation.onCompleted.addListener(({ tabId, url }) => {
+  try {
+    if (!url || !isHttp(url)) return;
+    applyToTab(tabId, url);
+  } catch (_) {}
+});
 // 激活标签时尝试恢复
 chrome.tabs.onActivated.addListener(({ tabId }) => {
-  chrome.tabs.get(tabId, (tab) => { if (tab) applyToTab(tab.id, tab.url); });
+  chrome.tabs.get(tabId, (tab) => { if (tab && tab.url) applyToTab(tab.id, tab.url); });
 });
 
 // 监听 SPA 页面，捕捉 history state 更新
-chrome.webNavigation.onHistoryStateUpdated.addListener(({ tabId, url }) => { applyToTab(tabId, url); });
+chrome.webNavigation.onHistoryStateUpdated.addListener(({ tabId, url }) => {
+  try {
+    if (!url || !isHttp(url)) return;
+    applyToTab(tabId, url);
+  } catch (_) {}
+});
 
 // 徽标同步
 chrome.storage.onChanged.addListener((changes) => {

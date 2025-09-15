@@ -25,9 +25,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnFull = document.getElementById("colorFull");
   const btnSoft = document.getElementById("colorSoft");
   const btnBW = document.getElementById("colorBW");
+  const btnReader = document.getElementById("toggleReader");
+
 
   let currentMode = null;   // "focus" | "kindle" | null
   let currentColor = null;  // "full" | "soft" | "bw" | null
+  let readerActive = false;
 
   function setActive(el, active) {
     if (!el) return;
@@ -40,12 +43,14 @@ document.addEventListener("DOMContentLoaded", () => {
     setActive(btnFull, currentColor === "full");
     setActive(btnSoft, currentColor === "soft");
     setActive(btnBW, currentColor === "bw");
+    setActive(btnReader, readerActive);
   }
 
   // Initialize from storage; default colorMode to "bw" if not set
-  chrome.storage.local.get(["mode", "colorMode"], (s) => {
+  chrome.storage.local.get(["mode", "colorMode", "readerMode"], (s) => {
     currentMode = s.mode ?? null;
     currentColor = s.colorMode ?? "bw";
+    readerActive = s.readerMode ?? false;
     render();
   });
 
@@ -53,6 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.mode) currentMode = changes.mode.newValue ?? null;
     if (changes.colorMode) currentColor = changes.colorMode.newValue ?? null;
+    if (changes.readerMode) readerActive = changes.readerMode.newValue ?? false;
     render();
   });
 
@@ -90,6 +96,13 @@ document.addEventListener("DOMContentLoaded", () => {
     render();
     chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
     withTab((tab) => send(tab.id, { action: "setColorMode", value: "bw" }));
+  });
+
+  btnReader?.addEventListener("click", () => {
+    readerActive = !readerActive;
+    render();
+    chrome.storage.local.set({ readerMode: readerActive });
+    withTab(tab => send(tab.id, { action: "toggleReader" }));
   });
 
   console.log("✅ Popup loaded");

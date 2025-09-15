@@ -22,7 +22,7 @@
     "content_scripts": [
       {
         "matches": ["<all_urls>"],
-        "js": ["content.js", "reader.js"],
+        "js": ["content.js", "libs/readability.js", "reader.js"],
         "run_at": "document_idle",
         "all_frames": true,
         "match_about_blank": true

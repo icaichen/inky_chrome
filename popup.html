@@ -50,9 +50,12 @@
 
   <h1>纸质色彩</h1>
   <div class="row">
-    <button id="colorFull">全彩</button>
-    <button id="colorSoft">淡彩</button>
-    <button id="colorBW">黑白</button>
+    <select id="colorSelect" style="flex:1; padding:6px; font-size:13px;">
+      <option value="" disabled selected>选择色彩模式</option>
+      <option value="full">全彩</option>
+      <option value="soft">淡彩</option>
+      <option value="bw">黑白</option>
+    </select>
   </div>
 
   <div id="status"></div>

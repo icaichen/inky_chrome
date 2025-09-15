@@ -185,13 +185,13 @@
     clearToast();
     stopGhosting();
     setPageFilter(getFilter(colorMode));
-    document.documentElement.style.backgroundColor = "#f7f7f7";
-    ensureOverlay(0.2, "multiply");
+    document.documentElement.style.backgroundColor = "#f9f9f5";  // 与 Kindle 模式一致
+    ensureOverlay(0.18, "soft-light");  // 与 Kindle 模式保持一致
     ghostTimer = setInterval(() => {
       if (overlayEl) {
         overlayEl.style.backgroundImage = `url(${makePaperTexture()})`;
       }
-    }, 6000);
+    }, 4000);  // 与 Kindle 模式保持一致
     clearToast();
     showToast("📖 Focus 模式已启用");
     chrome.storage?.local?.set?.({ mode, colorMode });

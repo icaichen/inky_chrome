@@ -22,10 +22,8 @@ function send(tabId, msg) {
 document.addEventListener("DOMContentLoaded", () => {
   const btnEink = document.getElementById("toggleEink");
   const btnKindle = document.getElementById("toggleKindle");
-  const btnFull = document.getElementById("colorFull");
-  const btnSoft = document.getElementById("colorSoft");
-  const btnBW = document.getElementById("colorBW");
   const btnReader = document.getElementById("toggleReader");
+  const colorSelect = document.getElementById("colorSelect");
 
 
   let currentMode = null;   // "focus" | "kindle" | null
@@ -40,16 +38,18 @@ document.addEventListener("DOMContentLoaded", () => {
   function render() {
     setActive(btnEink, currentMode === "focus");
     setActive(btnKindle, currentMode === "kindle");
-    setActive(btnFull, currentColor === "full");
-    setActive(btnSoft, currentColor === "soft");
-    setActive(btnBW, currentColor === "bw");
     setActive(btnReader, readerActive);
+
+    // Always show colorSelect dropdown
+    colorSelect.style.display = "block";
+    // Set value to currentColor or empty string if null/undefined
+    colorSelect.value = currentColor ?? "";
   }
 
-  // Initialize from storage; default colorMode to "bw" if not set
+  // Initialize from storage; allow colorMode to be null (no pre-selection)
   chrome.storage.local.get(["mode", "colorMode", "readerMode"], (s) => {
     currentMode = s.mode ?? null;
-    currentColor = s.colorMode ?? "bw";
+    currentColor = s.colorMode ?? null;
     readerActive = false;
     render();
   });
@@ -77,25 +77,11 @@ document.addEventListener("DOMContentLoaded", () => {
     withTab((tab) => send(tab.id, { action: "toggleKindle" }));
   });
 
-  btnFull?.addEventListener("click", () => {
-    currentColor = "full";
+  colorSelect?.addEventListener("change", () => {
+    currentColor = colorSelect.value;
     render();
     chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
-    withTab((tab) => send(tab.id, { action: "setColorMode", value: "full" }));
-  });
-
-  btnSoft?.addEventListener("click", () => {
-    currentColor = "soft";
-    render();
-    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
-    withTab((tab) => send(tab.id, { action: "setColorMode", value: "soft" }));
-  });
-
-  btnBW?.addEventListener("click", () => {
-    currentColor = "bw";
-    render();
-    chrome.storage.local.set({ mode: currentMode, colorMode: currentColor });
-    withTab((tab) => send(tab.id, { action: "setColorMode", value: "bw" }));
+    withTab((tab) => send(tab.id, { action: "setColorMode", value: currentColor }));
   });
 
   btnReader?.addEventListener("click", () => {

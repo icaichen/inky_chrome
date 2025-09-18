@@ -3,7 +3,7 @@
     "name": "E-Ink Paper Mode",
     "version": "1.2.0",
     "description": "Kindle/E-Ink 纸质观感：颗粒、纸纹、可选色彩，Kindle 模式含残影刷新。",
-    "permissions": ["activeTab", "storage", "scripting", "webNavigation"],
+    "permissions": ["activeTab", "storage", "webNavigation"],
     "host_permissions": ["<all_urls>"],
     "background": { "service_worker": "background.js" },
     "action": {
